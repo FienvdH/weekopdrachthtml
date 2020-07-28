@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+
+        function newEmployee() {
+            alert("doet hij het ?")
+            var obj = {};
+            obj.name = document.getElementById("denaam").value;
+            obj.salary = document.getElementById("hetsalaris").value;
+            objJSON = JSON.stringify(obj);
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                console.log("medewerker toegevoegd");
+            }
+            xhr.open("POST", "http://localhost:8082/api/employee/new", true); //asynchroon
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(objJSON);
+        }
+
+        function employeesKrijgen() {
+            alert("employees worden opgehaald")
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+
+                if (this.readyState == 4) {
+
+                    var inhoudDB = JSON.parse(this.responseText);
+                    var employeestring = "";
+                    var x;
+
+                    for (x = 0; x < inhoudDB.length; x++) {
+                        try {
+                            employeestring +=
+                                ` 
+                        <div>
+                        <h3>Name = ${inhoudDB[x].name} </h3>
+                        <p>ID = ${inhoudDB[x].id} </p>
+                        <p>Salaris = ${inhoudDB[x].salary}</p>
+                        <p>Telefoon = ${inhoudDB[x].phone.phoneNumber} </p>                        
+                        </div>
+                        `
+
+                        } catch (err) {
+
+                            employeestring +=
+                                ` 
+                        <div>
+                        <h3>Name = ${inhoudDB[x].name} </h3>
+                        <p>ID = ${inhoudDB[x].id} </p>
+                        <p>Salaris = ${inhoudDB[x].salary}</p>
+                        </div>
+
+                        
+                        `
+                        }
+                    }
+                    document.getElementById("employeeinfo").innerHTML = employeestring;
+                }
+            }
+            xhr.open("GET", "http://localhost:8082/api/employee/all", true);
+            xhr.send();
+        }
+
+        function changeSalary() {
+                    
+            var obj = {};
+            obj.id = document.getElementById("empid").value;
+            obj.salary = document.getElementById("nieuwsalaris").value;
+            objJSON = JSON.stringify(obj);
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                console.log("salaris aangepast");
+            }
+            xhr.open("PUT", "http://localhost:8082/api/employee/changesalary/" + obj.id, true); //asynchroon
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(objJSON);
+        }
+
+        function verwijderEmployee() {
+                    
+                    var obj = {};
+                    obj.id = document.getElementById("delid").value;
+                    objJSON = JSON.stringify(obj);
+        
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function () {
+                        console.log("employee verwijderd");
+                    }
+                    xhr.open("DELETE", "http://localhost:8082/api/employee/delete/" + obj.id, true); //asynchroon
+                    xhr.setRequestHeader("Content-Type", "application/json");
+                    xhr.send(objJSON);
+                }
+
+
+        
+
+
+
+
+    </script>
+    <title>Document</title>
+</head>
+
+<body>
+    <h3>Voeg hier nieuwe employees toe</h3>
+    <label for="denaam"> Naam </label>
+    <input type=text id=denaam> <br>
+    <label for="hetsalaris"> Salaris </label>
+    <input type=text id=hetsalaris><br>
+    <input type=button onclick=newEmployee() value=versturen> <br>
+
+    <h3>Pas het salaris aan</h3>
+    <label for="empid"> Zoek op id </label>
+    <input type=text id=empid> <br>
+    <label for="nieuwsalaris"> Nieuw salaris </label>
+    <input type=text id=nieuwsalaris><br>
+    <input type=button onclick=changeSalary() value=aanpassen> <br>
+
+    <h3>Verwijder een medewerker</h3>
+    <label for="delid"> Verwijder id </label>
+    <input type=text id=delid> <br>
+    <input type=button onclick=verwijderEmployee() value=verwijderen> <br>
+
+    <h3>Toon alle medewerkers</h3>
+    <input type="button" onclick="employeesKrijgen()" value="Toon employees">
+    <div id=employeeinfo></div>
+
+</body>
+
+</html>
